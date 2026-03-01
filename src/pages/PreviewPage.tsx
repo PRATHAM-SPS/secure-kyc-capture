@@ -1,17 +1,40 @@
 import { useLocation, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 import type { CaptureData } from "../types/capture";
-import logo from "../assets/logo.svg";
+import logoLight from "../assets/logo-light.svg";
+import logoDark from "../assets/logo.svg";
 
 export default function PreviewPage() {
   const location = useLocation();
   const navigate = useNavigate();
   const data = location.state as CaptureData | undefined;
 
+  const [darkMode, setDarkMode] = useState(false);
+
+  // Load saved theme or system preference
+  useEffect(() => {
+    const savedTheme = localStorage.getItem("theme");
+    if (savedTheme) {
+      setDarkMode(savedTheme === "dark");
+    } else {
+      const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      setDarkMode(prefersDark);
+    }
+  }, []);
+
+  // Persist theme
+  useEffect(() => {
+    localStorage.setItem("theme", darkMode ? "dark" : "light");
+  }, [darkMode]);
+
+  const theme = darkMode ? darkTheme : lightTheme;
+  const currentLogo = darkMode ? logoLight : logoDark;
+
   if (!data) {
     return (
-      <div style={styles.center}>
+      <div style={{ ...styles.center, backgroundColor: theme.background }}>
         <h2>No image captured</h2>
-        <button style={styles.button} onClick={() => navigate("/")}>
+        <button style={theme.button} onClick={() => navigate("/")}>
           Go Back
         </button>
       </div>
@@ -19,28 +42,35 @@ export default function PreviewPage() {
   }
 
   return (
-    <div style={styles.page}>
+    <div style={{ ...styles.page, backgroundColor: theme.background, color: theme.text }}>
       
       {/* NAVBAR */}
-      <div style={styles.navbar}>
-        <img src={logo} alt="Secure KYC Capture" style={styles.logo} />
+      <div style={{ ...styles.navbar, backgroundColor: theme.navbar, borderBottom: theme.border }}>
+        <img src={currentLogo} alt="Secure KYC Capture" style={styles.logo} />
+
+        <button
+          onClick={() => setDarkMode(!darkMode)}
+          style={styles.toggleButton}
+        >
+          {darkMode ? "☀️ Light" : "🌙 Dark"}
+        </button>
       </div>
 
       {/* HERO */}
       <div style={styles.hero}>
         <h1 style={styles.title}>Secure KYC Capture</h1>
-        <p style={styles.subtitle}>
+        <p style={{ ...styles.subtitle, color: theme.subtitle }}>
           Intelligent Auto-Capture & AI Powered Document Detection
         </p>
       </div>
 
       {/* RESULT CARD */}
-      <div style={styles.card}>
+      <div style={{ ...styles.card, backgroundColor: theme.card }}>
         <h2 style={{ marginBottom: 20 }}>Captured Document</h2>
 
         <img src={data.image} alt="Captured" style={styles.image} />
 
-        <div style={styles.meta}>
+        <div style={{ ...styles.meta, color: theme.meta }}>
           <p><strong>Type:</strong> {data.docType}</p>
           <p>
             <strong>Confidence:</strong>{" "}
@@ -48,66 +78,120 @@ export default function PreviewPage() {
           </p>
         </div>
 
-        <button style={styles.button} onClick={() => navigate("/")}>
+        <button style={theme.button} onClick={() => navigate("/")}>
           Retake
         </button>
       </div>
 
       {/* FOOTER */}
-      <div style={styles.footer}>
+      <div style={{ ...styles.footer, color: theme.footer }}>
         <p>
           secure-kyc-capture is a privacy-first React component for automatic
           document detection in the browser.
         </p>
 
-        <p style={{ marginTop: 20, opacity: 0.6 }}>
-          Made with ❤️ by <strong>Pratham Ingawale</strong>  
+        <p style={{ marginTop: 20, opacity: 0.7 }}>
+          Made with ❤️ by <strong>Pratham Ingawale</strong>
           <br />
           GitHub: PRATHAM-SPS
         </p>
       </div>
-
     </div>
   );
 }
+
+/* ---------------- THEMES ---------------- */
+
+const lightTheme = {
+  background: "#F8FAFC",
+  navbar: "#FFFFFF",
+  card: "#FFFFFF",
+  text: "#0F172A",
+  subtitle: "#64748B",
+  meta: "#334155",
+  footer: "#64748B",
+  border: "1px solid #E5E7EB",
+  button: {
+    padding: "12px 28px",
+    borderRadius: "10px",
+    border: "none",
+    backgroundColor: "#22C55E",
+    color: "#fff",
+    fontWeight: 600,
+    cursor: "pointer",
+    fontSize: "15px"
+  }
+};
+
+const darkTheme = {
+  background: "#0B1220",
+  navbar: "#111827",
+  card: "#1F2937",
+  text: "#F9FAFB",
+  subtitle: "#9CA3AF",
+  meta: "#D1D5DB",
+  footer: "#9CA3AF",
+  border: "1px solid rgba(255,255,255,0.05)",
+  button: {
+    padding: "12px 28px",
+    borderRadius: "10px",
+    border: "none",
+    backgroundColor: "#22C55E",
+    color: "#fff",
+    fontWeight: 600,
+    cursor: "pointer",
+    fontSize: "15px"
+  }
+};
+
+/* ---------------- SHARED STYLES ---------------- */
 
 const styles: { [key: string]: React.CSSProperties } = {
   page: {
     width: "100%",
     minHeight: "100vh",
-    backgroundColor: "#F8FAFC",
     fontFamily: "Inter, sans-serif",
-    color: "#0F172A",
     display: "flex",
-    flexDirection: "column"
+    flexDirection: "column",
+    transition: "background 0.3s ease"
   },
 
   navbar: {
     width: "100%",
-    padding: "16px 40px", // reduced
-    backgroundColor: "#FFFFFF",
-    borderBottom: "1px solid #E5E7EB"
+    padding: "16px 40px",
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center"
   },
 
   logo: {
-    height: "70px", // slightly reduced
+    height: "70px",
     width: "auto"
+  },
+
+  toggleButton: {
+    padding: "8px 16px",
+    borderRadius: "8px",
+    border: "1px solid #CBD5E1",
+    background: "transparent",
+    cursor: "pointer",
+    fontSize: "14px",
+    fontWeight: 600
   },
 
   hero: {
     textAlign: "center",
-    marginTop: "40px",   // reduced from 70+
-    marginBottom: "40px" // reduced from 80+
+    marginTop: "40px",
+    marginBottom: "40px"
   },
 
   title: {
-    fontSize: "36px", // slightly reduced
+    fontSize: "36px",
     marginBottom: "8px",
     fontWeight: 700
   },
 
   subtitle: {
-    color: "#64748B",
     fontSize: "16px"
   },
 
@@ -115,11 +199,10 @@ const styles: { [key: string]: React.CSSProperties } = {
     width: "100%",
     maxWidth: "760px",
     margin: "0 auto",
-    backgroundColor: "#FFFFFF",
     borderRadius: "20px",
-    padding: "32px", // reduced from 50
+    padding: "32px",
     textAlign: "center",
-    boxShadow: "0 15px 40px rgba(0,0,0,0.06)"
+    boxShadow: "0 15px 40px rgba(0,0,0,0.08)"
   },
 
   image: {
@@ -130,29 +213,16 @@ const styles: { [key: string]: React.CSSProperties } = {
 
   meta: {
     marginBottom: "20px",
-    fontSize: "15px",
-    color: "#334155"
-  },
-
-  button: {
-    padding: "12px 28px",
-    borderRadius: "10px",
-    border: "none",
-    backgroundColor: "#22C55E",
-    color: "#fff",
-    fontWeight: 600,
-    cursor: "pointer",
     fontSize: "15px"
   },
 
   footer: {
-    marginTop: "50px", // reduced from 100
+    marginTop: "50px",
     textAlign: "center",
     paddingBottom: "40px",
     maxWidth: "800px",
     marginLeft: "auto",
-    marginRight: "auto",
-    color: "#64748B"
+    marginRight: "auto"
   },
 
   center: {
