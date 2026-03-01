@@ -1,7 +1,7 @@
 # Secure KYC Capture -- Example App
 
 <p align="left">
-<img src="https://raw.githubusercontent.com/PRATHAM-SPS/secure-kyc-capture/main/src/assets/logo.svg" alt="Secure KYC Capture Logo" height="100"/>
+<img src="https://raw.githubusercontent.com/PRATHAM-SPS/secure-kyc-capture/main/src/assets/logo-light.svg" alt="Secure KYC Capture Logo" height="100"/>
 </p>
 
 This repository contains a full working **React + TypeScript** example
