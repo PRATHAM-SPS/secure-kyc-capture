@@ -20,7 +20,7 @@
   <path d="M82 82 L90 90 L102 76" stroke="#22C55E" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
 
   <!-- Brand Text -->
-  <text x="150" y="65" font-family="Inter, Arial, sans-serif" font-size="32" font-weight="700" fill="#0F172A">
+  <text x="150" y="65" font-family="Inter, Arial, sans-serif" font-size="32" font-weight="700" fill="#94A3B8">
     Secure
   </text>
 
